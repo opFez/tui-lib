@@ -2,6 +2,7 @@
 #define TUI_H
 
 #include <stdint.h>
+#include <stddef.h>
 
 /* color constants */
 #define TUI_DEFAULT 0x00
@@ -77,7 +78,7 @@ typedef unsigned char byte;
  * allowed), a foreground color and a background color.
  */
 struct cell {
-	byte ch; // ascii only
+	char ch; // ascii only
 	uint16_t fg;
 	uint16_t bg;
 };
@@ -98,10 +99,22 @@ struct cell_buffer {
  * representation of an ascii space (' ') and default foreground and background 
  * colors.
  */
-const struct cell empty_cell;
+/* const struct cell empty_cell = { */
+/* 	' ', */
+/* 	TUI_DEFAULT_FG, */
+/* 	TUI_DEFAULT_BG */
+/* }; */
+extern const struct cell empty_cell;
 
-/* the default cell buffer is stdscr and is exposed by the library. */
-struct cell_buffer stdscr;
+/* The default cell buffer is stdscr and is exposed by the library.
+ * This is the unitialized state.
+ */
+extern struct cell_buffer stdscr;
+/* = { */
+/* 	NULL, */
+/* 	-1, */
+/* 	-1 */
+/* }; */
 
 
 /* Functions */
@@ -130,14 +143,17 @@ void tui_clear(struct cell_buffer *, struct cell);
  * cell buffer provided in the first argument, effectively changing the cell at 
  * those coordinates.
  */
-void tui_set_cell(struct cell buffer *, int, int, struct cell);
+void tui_set_cell(struct cell_buffer *, int, int, struct cell);
 
 
 /* tui_hide_cursor() makes the cursor invisible. Useful for drawing the screen.
  * tui_show_cursor() makes the cursor visible again.
+ * tui_set_cursor() sets the position of the cursor to those given as arguments.
+ * The first argument is the x-value and the second value is the y-value.
  */
 void tui_hide_cursor();
 void tui_show_cursor();
+void tui_set_cursor(int, int);
 
 
 #endif /* TUI_H */

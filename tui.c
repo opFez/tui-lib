@@ -1,5 +1,7 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/ioctl.h>
 #include <termios.h>
 #include <unistd.h>
@@ -14,19 +16,20 @@ const struct cell empty_cell = {
 	TUI_DEFAULT_BG
 };
 
-
 /* global cell buffer */
 struct cell_buffer stdscr = {
 	NULL,
-	-1,  /* uninitialized */
+	-1,
 	-1
 };
+
+int cursor_visible = 0;
 
 static void
 die(const char *s)
 {
 	perror(s);
-	exit(1);
+	exit(EXIT_FAILURE);
 }
 
 static void
@@ -59,7 +62,8 @@ get_window_size(int *height, int *width)
 {
 	struct winsize ws;
 
-	ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws);
+	if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1)
+		die("ioctl");
 
 	if (height != NULL)
 		*height = ws.ws_row;
@@ -70,12 +74,22 @@ get_window_size(int *height, int *width)
 static void
 init_cell_buffer(struct cell_buffer *cb)
 {
+	if (cb->cells == NULL) {
+		fprintf(stderr, "init_cell_buffer: cannot intialize intialized cell buffer. Exiting.\n");
+		exit(EXIT_FAILURE);
+	}
 	long ncells = cb->width * cb->height;
+	assert(ncells > 0);
 	cb->cells = malloc(ncells * sizeof(struct cell));
 	for (long i = 0; i < ncells; i++)
 		cb->cells[i] = empty_cell;
 }
 
+static void
+free_cell_buffer(struct cell_buffer *cb)
+{
+	free(cb->cells);
+}
 
 static void
 save_cursor()
@@ -87,6 +101,37 @@ static void
 restore_cursor()
 {
 	write(STDOUT_FILENO, "\033[u", 3);
+}
+
+/* kr */
+static void
+reverse(char s[])
+{
+    int c, i, j;
+
+    for (i = 0, j = strlen(s) - 1; i < j; i++, j--) {
+        c = s[i];
+        s[i] = s[j];
+        s[j] = c;
+    }
+}
+
+/* kr */
+static void
+itoa(int n, char out[])
+{
+	int i, sign;
+
+	if ((sign = n) < 0) /* record sign */
+		n = -n;           /* make n positive */
+	i = 0;
+	do {  /* generate digits in reverse order */
+		out[i++] = n % 10 + '0';  /* get next digit */
+	} while ((n /= 10) > 0);   /* delete it */
+	if (sign < 0)
+		out[i++] = '-';
+	out[i] = '\0';
+	reverse(out);
 }
 
 /****************************************************/
@@ -103,6 +148,7 @@ tui_init()
 void
 tui_shutdown()
 {
+	free_cell_buffer(&stdscr);
 	disable_raw_mode();
 }
 
@@ -165,11 +211,30 @@ tui_set_cell(struct cell_buffer *cb, int x, int y, struct cell c)
 void
 tui_hide_cursor()
 {
+	cursor_visible = 0;
 	write(STDOUT_FILENO, "\033[?25l", 6);
 }
 
 void
 tui_show_cursor()
 {
+	cursor_visible = 1;
 	write(STDOUT_FILENO, "\033[?25h", 6);
+}
+
+void
+tui_set_cursor(int x, int y)
+{
+	/* It looks like x and y has to be 1-indexed, so correct this by adding 1 to
+	 * each of them. */
+	char xcoord[8] = {0};
+	itoa(x + 1, xcoord);
+	char ycoord[8] = {0};
+	itoa(y + 1, ycoord);
+
+	write(STDOUT_FILENO, "\033[", 2);
+	write(STDOUT_FILENO, xcoord, strlen(xcoord));
+	write(STDOUT_FILENO, ";", 1);
+	write(STDOUT_FILENO, ycoord, strlen(ycoord));
+	write(STDOUT_FILENO, "H", 1);
 }
