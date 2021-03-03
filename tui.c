@@ -74,10 +74,6 @@ get_window_size(int *height, int *width)
 static void
 init_cell_buffer(struct cell_buffer *cb)
 {
-	if (cb->cells == NULL) {
-		fprintf(stderr, "init_cell_buffer: cannot intialize intialized cell buffer. Exiting.\n");
-		exit(EXIT_FAILURE);
-	}
 	long ncells = cb->width * cb->height;
 	assert(ncells > 0);
 	cb->cells = malloc(ncells * sizeof(struct cell));
