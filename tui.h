@@ -78,6 +78,8 @@ struct cell_buffer {
 	int width;
 };
 
+struct cell_buffer stdscr;
+
 void tui_init();
 void tui_shutdown();
 

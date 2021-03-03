@@ -75,6 +75,32 @@ init_cell_buffer(struct cell_buffer *cb)
 		cb->cells[i] = empty_cell;
 }
 
+static void
+hide_cursor()
+{
+	write(STDOUT_FILENO, "\033[?25l", 6);
+}
+
+static void
+show_cursor()
+{
+	write(STDOUT_FILENO, "\033[?25h", 6);
+}
+
+static void
+save_cursor()
+{
+	write(STDOUT_FILENO, "\033[s", 3);
+}
+
+static void
+restore_cursor()
+{
+	write(STDOUT_FILENO, "\033[u", 3);
+}
+
+
+
 /****************************************************/
 
 void
@@ -83,14 +109,7 @@ tui_init()
 	tui_enable_raw_mode();
 	get_window_size(&stdscr.height, &stdscr.width);
 	init_cell_buffer(&stdscr);
-	struct cell a = {
-		'#',
-		TUI_BLACK,
-		TUI_WHITE
-	};
 	tui_clear(&stdscr, empty_cell);
-	tui_clear(&stdscr, a);
-	tui_refresh(&stdscr);
 }
 
 void
@@ -118,24 +137,24 @@ tui_height()
 void
 tui_refresh(struct cell_buffer *cb)
 {
+	hide_cursor();
+	save_cursor();
+	write(STDOUT_FILENO, "\033[0;0H", 6);
 	for (int y = 0; y < cb->height; y++) {
 		for (int x = 0; x < cb->width; x++) {
 			// currently doesn't handle cell's fg and bg
+			/* printf("\033[%d;%dm", */
+			/* 	   cb->cells[current_cell].fg + 29, */
+			/* 	   cb->cells[current_cell].bg + 39); */
 			long current_cell = x + y * cb->width;
-			fprintf(stderr,
-					"\033[mCell number %ld, fg: %d, bg: %d\r\n",
-					current_cell,
-					cb->cells[current_cell].fg,
-					cb->cells[current_cell].bg);
-			printf("\033[%d;%dm",
-				   cb->cells[current_cell].fg + 29,
-				   cb->cells[current_cell].bg + 39);
 			byte buffer[1];
 			buffer[0] = cb->cells[current_cell].ch;
 			write(STDOUT_FILENO, buffer, 1);
 		}
 		write(STDOUT_FILENO, "\r\n", 2);
 	}
+	restore_cursor();
+	show_cursor();
 }
 
 void
@@ -154,3 +173,4 @@ tui_set_cell(struct cell_buffer *cb, int x, int y, struct cell c)
 		return;
 	cb->cells[x + y * cb->width] = c;
 }
+
