@@ -89,6 +89,9 @@ int tui_height();
 void tui_refresh();
 void tui_clear();
 
+void tui_hide_cursor();
+void tui_show_cursor();
+
 void tui_set_cell();
 
 #endif /* TUI_H */

@@ -29,14 +29,14 @@ die(const char *s)
 }
 
 static void
-tui_disable_raw_mode()
+disable_raw_mode()
 {
 	if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios) == -1)
 		die("tcsetattr");
 }
 
 static void
-tui_enable_raw_mode()
+enable_raw_mode()
 {
 	if (tcgetattr(STDIN_FILENO, &orig_termios) == -1)
 		die("tcgetattr");
@@ -75,17 +75,6 @@ init_cell_buffer(struct cell_buffer *cb)
 		cb->cells[i] = empty_cell;
 }
 
-static void
-hide_cursor()
-{
-	write(STDOUT_FILENO, "\033[?25l", 6);
-}
-
-static void
-show_cursor()
-{
-	write(STDOUT_FILENO, "\033[?25h", 6);
-}
 
 static void
 save_cursor()
@@ -99,14 +88,12 @@ restore_cursor()
 	write(STDOUT_FILENO, "\033[u", 3);
 }
 
-
-
 /****************************************************/
 
 void
 tui_init()
 {
-	tui_enable_raw_mode();
+	enable_raw_mode();
 	get_window_size(&stdscr.height, &stdscr.width);
 	init_cell_buffer(&stdscr);
 	tui_clear(&stdscr, empty_cell);
@@ -115,7 +102,7 @@ tui_init()
 void
 tui_shutdown()
 {
-	tui_disable_raw_mode();
+	disable_raw_mode();
 }
 
 int
@@ -137,7 +124,7 @@ tui_height()
 void
 tui_refresh(struct cell_buffer *cb)
 {
-	hide_cursor();
+	tui_hide_cursor();
 	save_cursor();
 	write(STDOUT_FILENO, "\033[0;0H", 6);
 	for (int y = 0; y < cb->height; y++) {
@@ -154,7 +141,7 @@ tui_refresh(struct cell_buffer *cb)
 		write(STDOUT_FILENO, "\r\n", 2);
 	}
 	restore_cursor();
-	show_cursor();
+	tui_show_cursor();
 }
 
 void
@@ -174,3 +161,14 @@ tui_set_cell(struct cell_buffer *cb, int x, int y, struct cell c)
 	cb->cells[x + y * cb->width] = c;
 }
 
+void
+tui_hide_cursor()
+{
+	write(STDOUT_FILENO, "\033[?25l", 6);
+}
+
+void
+tui_show_cursor()
+{
+	write(STDOUT_FILENO, "\033[?25h", 6);
+}
