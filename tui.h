@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+/* color constants */
 #define TUI_DEFAULT 0x00
 #define TUI_BLACK   0x01
 #define TUI_RED     0x02
@@ -16,6 +17,7 @@
 #define TUI_DEFAULT_FG TUI_DEFAULT
 #define TUI_DEFAULT_BG TUI_BLACK
 
+/* character constants */
 #define TUI_KEY_CTRL_TILDE       0x00
 #define TUI_KEY_CTRL_2           0x00
 #define TUI_KEY_CTRL_A           0x01
@@ -62,36 +64,80 @@
 #define TUI_KEY_BACKSPACE2       0x7F
 #define TUI_KEY_CTRL_8           0x7F
 
+/* macro function for getting the value of a key if the ctrl key is held down */
 #define TUI_CTRL_KEY(k) ((k) & 0x1f)
 
 typedef unsigned char byte;
 
+
+/* Structs */
+
+/* One character in the buffer is called a cell.
+ * It has a character representation (currently only ascii characters are 
+ * allowed), a foreground color and a background color.
+ */
 struct cell {
 	byte ch; // ascii only
 	uint16_t fg;
 	uint16_t bg;
 };
 
+/* Internal representation of the screen.
+ * It holds an array of cells, of length height * width.
+ */
 struct cell_buffer {
 	struct cell *cells;
 	int height;
 	int width;
 };
 
+
+/* Variables */
+
+/* The empty cell, mostly used for clearing the screen. It has a character 
+ * representation of an ascii space (' ') and default foreground and background 
+ * colors.
+ */
+const struct cell empty_cell;
+
+/* the default cell buffer is stdscr and is exposed by the library. */
 struct cell_buffer stdscr;
 
+
+/* Functions */
+
+/* tui_init() initializes stdscr and initializes raw mode.
+ * tui_shutdown() disables raw mode.
+ */
 void tui_init();
 void tui_shutdown();
 
+/* returns the width and height of the current terminal window. */
 int tui_width();
 int tui_height();
 
-void tui_refresh();
-void tui_clear();
+/* tui_refresh() displays the contents of the cell buffer provided as the 
+ * argument.
+ * tui_clear() fills the entire cellbuffer provided in the first argument with
+ * the cell provided in the cell provided in the second argument. You can use 
+ * the empty_cell variable to clear the cell buffer with a cell representing a 
+ * ' ' with default foreground and background colors.
+ */
+void tui_refresh(struct cell_buffer);
+void tui_clear(struct cell_buffer *, struct cell);
 
+/* tui_set_cell() replaces the cell located at index x + y * cb->width in the
+ * cell buffer provided in the first argument, effectively changing the cell at 
+ * those coordinates.
+ */
+void tui_set_cell(struct cell buffer *, int, int, struct cell);
+
+
+/* tui_hide_cursor() makes the cursor invisible. Useful for drawing the screen.
+ * tui_show_cursor() makes the cursor visible again.
+ */
 void tui_hide_cursor();
 void tui_show_cursor();
 
-void tui_set_cell();
 
 #endif /* TUI_H */

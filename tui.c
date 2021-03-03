@@ -8,11 +8,12 @@
 
 static struct termios orig_termios;
 
-static const struct cell empty_cell = {
+const struct cell empty_cell = {
 	' ',
 	TUI_DEFAULT_FG,
 	TUI_DEFAULT_BG
 };
+
 
 /* global cell buffer */
 struct cell_buffer stdscr = {
@@ -122,20 +123,20 @@ tui_height()
 }
 
 void
-tui_refresh(struct cell_buffer *cb)
+tui_refresh(struct cell_buffer cb)
 {
 	tui_hide_cursor();
 	save_cursor();
 	write(STDOUT_FILENO, "\033[0;0H", 6);
-	for (int y = 0; y < cb->height; y++) {
-		for (int x = 0; x < cb->width; x++) {
+	for (int y = 0; y < cb.height; y++) {
+		for (int x = 0; x < cb.width; x++) {
 			// currently doesn't handle cell's fg and bg
 			/* printf("\033[%d;%dm", */
 			/* 	   cb->cells[current_cell].fg + 29, */
 			/* 	   cb->cells[current_cell].bg + 39); */
-			long current_cell = x + y * cb->width;
+			long current_cell = x + y * cb.width;
 			byte buffer[1];
-			buffer[0] = cb->cells[current_cell].ch;
+			buffer[0] = cb.cells[current_cell].ch;
 			write(STDOUT_FILENO, buffer, 1);
 		}
 		write(STDOUT_FILENO, "\r\n", 2);
