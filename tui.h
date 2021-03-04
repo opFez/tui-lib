@@ -99,22 +99,15 @@ struct cell_buffer {
  * representation of an ascii space (' ') and default foreground and background 
  * colors.
  */
-/* const struct cell empty_cell = { */
-/* 	' ', */
-/* 	TUI_DEFAULT_FG, */
-/* 	TUI_DEFAULT_BG */
-/* }; */
 extern const struct cell empty_cell;
 
 /* The default cell buffer is stdscr and is exposed by the library.
  * This is the unitialized state.
  */
 extern struct cell_buffer stdscr;
-/* = { */
-/* 	NULL, */
-/* 	-1, */
-/* 	-1 */
-/* }; */
+
+/* cursor_visible, set to 1 if cursor is visible, 0 if not. */
+extern int cursor_visible;
 
 
 /* Functions */
