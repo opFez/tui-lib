@@ -124,13 +124,22 @@ int tui_height();
 
 /* tui_refresh() displays the contents of the cell buffer provided as the 
  * argument.
+ * tui_refresh_cell() displays of a specific cell in the cell buffer provided
+ * as the first argument. The second and third argument is the x and y
+ * coordinates of the cell to refresh. This function is provided so one has the
+ * ability to refresh a piece of the window, without refreshing the entire cell
+ * buffer, which can lead to some graphical glitches on some terminals.
+ *   WARNING: tui_refresh_cell() doesn't work properly.
  * tui_clear() fills the entire cellbuffer provided in the first argument with
  * the cell provided in the cell provided in the second argument. You can use 
  * the empty_cell variable to clear the cell buffer with a cell representing a 
  * ' ' with default foreground and background colors.
+ * tui_clear_screen() clears the screen fast without affecting any cell buffer.
  */
 void tui_refresh(struct cell_buffer);
+void tui_refresh_cell(struct cell_buffer, int, int);
 void tui_clear(struct cell_buffer *, struct cell);
+void tui_clear_screen();
 
 /* tui_set_cell() replaces the cell located at index x + y * cb->width in the
  * cell buffer provided in the first argument, effectively changing the cell at 

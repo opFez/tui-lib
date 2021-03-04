@@ -146,6 +146,8 @@ tui_shutdown()
 {
 	free_cell_buffer(&stdscr);
 	disable_raw_mode();
+	tui_set_cursor(0, 0);
+	tui_clear_screen();
 }
 
 int
@@ -177,12 +179,23 @@ tui_refresh(struct cell_buffer cb)
 			/* 	   cb->cells[current_cell].fg + 29, */
 			/* 	   cb->cells[current_cell].bg + 39); */
 			long current_cell = x + y * cb.width;
-			byte buffer[1];
-			buffer[0] = cb.cells[current_cell].ch;
-			write(STDOUT_FILENO, buffer, 1);
+			write(STDOUT_FILENO, &cb.cells[current_cell].ch, 1);
 		}
 		write(STDOUT_FILENO, "\r\n", 2);
 	}
+	restore_cursor();
+	tui_show_cursor();
+}
+
+void
+tui_refresh_cell(struct cell_buffer cb, int x, int y)
+{
+	tui_hide_cursor();
+	save_cursor();
+
+	tui_set_cursor(x, y);
+	write(STDOUT_FILENO, &cb.cells[x + y * cb.width].ch, 1);
+
 	restore_cursor();
 	tui_show_cursor();
 }
@@ -195,6 +208,12 @@ tui_clear(struct cell_buffer *cb, struct cell clear_cell)
 		cb->cells[i] = clear_cell;
 	}
 }
+
+void
+tui_clear_screen()
+{
+	write(STDOUT_FILENO, "\033[2J", 4);
+}	
 
 void
 tui_set_cell(struct cell_buffer *cb, int x, int y, struct cell c)
@@ -229,8 +248,8 @@ tui_set_cursor(int x, int y)
 	itoa(y + 1, ycoord);
 
 	write(STDOUT_FILENO, "\033[", 2);
-	write(STDOUT_FILENO, xcoord, strlen(xcoord));
+	write(STDOUT_FILENO, ycoord, strlen(xcoord));
 	write(STDOUT_FILENO, ";", 1);
-	write(STDOUT_FILENO, ycoord, strlen(ycoord));
+	write(STDOUT_FILENO, xcoord, strlen(ycoord));
 	write(STDOUT_FILENO, "H", 1);
 }
