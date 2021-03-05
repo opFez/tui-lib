@@ -171,7 +171,8 @@ tui_height()
 void
 tui_refresh(struct cell_buffer cb)
 {
-	tui_hide_cursor();
+	if (cursor_visible)
+		tui_hide_cursor();
 	save_cursor();
 	write(STDOUT_FILENO, "\033[0;0H", 6);
 	for (int y = 0; y < cb.height; y++) {
@@ -186,7 +187,8 @@ tui_refresh(struct cell_buffer cb)
 		write(STDOUT_FILENO, "\r\n", 2);
 	}
 	restore_cursor();
-	tui_show_cursor();
+	if (cursor_visible)
+		tui_show_cursor();
 	fflush(stdout);
 }
 
@@ -216,7 +218,7 @@ void
 tui_clear_screen()
 {
 	write(STDOUT_FILENO, "\033[2J", 4);
-}	
+}
 
 void
 tui_set_cell(struct cell_buffer *cb, int x, int y, struct cell c)
@@ -310,5 +312,5 @@ tui_peek()
 		return (struct event) {
 			0, c
 		};
-	}	
+	}
 }
