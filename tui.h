@@ -4,6 +4,10 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* color constants */
 #define TUI_DEFAULT 0x00
 #define TUI_BLACK   0x01
@@ -169,5 +173,10 @@ void tui_set_cursor(int, int);
 
 /* tui_poll() waits for input, and returns the event it recieved */
 struct event tui_poll();
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* TUI_H */
