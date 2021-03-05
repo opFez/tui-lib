@@ -96,7 +96,7 @@ struct cell_buffer {
 	int width;
 };
 
-/* Return type of polling events.
+/* Return type of polling/peeking events.
  * The prefix field will be filled with an eventual ^[ (escape key hit). This
  * happens if inputting the alt-key as a modifier. This unfortunately means you
  * have to hit the escape key two times to register the escape key by itself.

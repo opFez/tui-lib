@@ -1,0 +1,3 @@
+tui-lib is a library for creating TUI applications, in similar vein to ncurses.
+It was made for personal use, but should work for others as well.
+The tui.h file provides documentation for the different structs and functions.
