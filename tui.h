@@ -171,8 +171,12 @@ void tui_hide_cursor();
 void tui_show_cursor();
 void tui_set_cursor(int, int);
 
-/* tui_poll() waits for input, and returns the event it recieved */
+/* tui_poll() waits for input, and returns the event it recieved.
+ * tui_peek() gets buffered input. The program will not stop and wait for input,
+ * like tui_poll(), but buffered input will be returned.
+ */
 struct event tui_poll();
+struct event tui_peek();
 
 
 #ifdef __cplusplus

@@ -292,3 +292,23 @@ tui_poll()
 		};
 	}
 }
+
+struct event
+tui_peek()
+{
+	char c;
+
+	read(STDIN_FILENO, &c, 1);
+	if (c == TUI_KEY_ESC) {
+		read(STDIN_FILENO, &c, 1);
+
+		return (struct event) {
+			TUI_KEY_ESC, c
+		};
+	}
+	else {
+		return (struct event) {
+			0, c
+		};
+	}	
+}
