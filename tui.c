@@ -9,6 +9,7 @@
 #include "tui.h"
 
 static struct termios orig_termios;
+static struct termios raw;
 
 const struct cell empty_cell = {
 	' ',
@@ -45,7 +46,7 @@ enable_raw_mode()
 	if (tcgetattr(STDIN_FILENO, &orig_termios) == -1)
 		die("tcgetattr");
 
-	struct termios raw = orig_termios;
+	raw = orig_termios;
 	raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
 	raw.c_oflag &= ~(OPOST);
 	raw.c_cflag |= (CS8);
@@ -136,6 +137,7 @@ void
 tui_init()
 {
 	enable_raw_mode();
+	tui_set_cursor(0, 0);
 	get_window_size(&stdscr.height, &stdscr.width);
 	init_cell_buffer(&stdscr);
 	tui_clear(&stdscr, empty_cell);
@@ -185,6 +187,7 @@ tui_refresh(struct cell_buffer cb)
 	}
 	restore_cursor();
 	tui_show_cursor();
+	fflush(stdout);
 }
 
 void
@@ -252,4 +255,40 @@ tui_set_cursor(int x, int y)
 	write(STDOUT_FILENO, ";", 1);
 	write(STDOUT_FILENO, xcoord, strlen(ycoord));
 	write(STDOUT_FILENO, "H", 1);
+}
+
+/* can probably be simplified, but it works well */
+struct event
+tui_poll()
+{
+	char c;
+
+	/* change attributes to make the program wait for input */
+	raw.c_cc[VMIN] = 1;
+	if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1)
+		die("tcsetattr");
+
+	read(STDIN_FILENO, &c, 1);
+	if (c == TUI_KEY_ESC) {
+		read(STDIN_FILENO, &c, 1);
+
+		/* reset attributes */
+		raw.c_cc[VMIN] = 0;
+		if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1)
+			die("tcsetattr");
+
+		return (struct event) {
+			TUI_KEY_ESC, c
+		};
+	}
+	else {
+		/* reset attributes */
+		raw.c_cc[VMIN] = 0;
+		if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1)
+			die("tcsetattr");
+
+		return (struct event) {
+			0, c
+		};
+	}
 }

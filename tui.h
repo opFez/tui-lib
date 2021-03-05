@@ -92,6 +92,16 @@ struct cell_buffer {
 	int width;
 };
 
+/* Return type of polling events.
+ * The prefix field will be filled with an eventual ^[ (escape key hit). This
+ * happens if inputting the alt-key as a modifier. This unfortunately means you
+ * have to hit the escape key two times to register the escape key by itself.
+ */
+struct event {
+	char prefix;
+	char key;
+};
+
 
 /* Variables */
 
@@ -157,5 +167,7 @@ void tui_hide_cursor();
 void tui_show_cursor();
 void tui_set_cursor(int, int);
 
+/* tui_poll() waits for input, and returns the event it recieved */
+struct event tui_poll();
 
 #endif /* TUI_H */
