@@ -150,6 +150,8 @@ tui_shutdown()
 	disable_raw_mode();
 	tui_set_cursor(0, 0);
 	tui_clear_screen();
+	if (!cursor_visible)
+		tui_show_cursor();
 }
 
 int
