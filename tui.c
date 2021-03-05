@@ -186,7 +186,8 @@ tui_refresh(struct cell_buffer cb)
 			long current_cell = x + y * cb.width;
 			write(STDOUT_FILENO, &cb.cells[current_cell].ch, 1);
 		}
-		write(STDOUT_FILENO, "\r\n", 2);
+		if (y != cb.height - 1)
+			write(STDOUT_FILENO, "\r\n", 2);
 	}
 	restore_cursor();
 	if (cursor_visible)
