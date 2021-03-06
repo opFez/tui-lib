@@ -77,7 +77,7 @@ init_cell_buffer(struct cell_buffer *cb)
 {
 	long ncells = cb->width * cb->height;
 	assert(ncells > 0);
-	cb->cells = malloc(ncells * sizeof(struct cell));
+	cb->cells = malloc(ncells * sizeof(*cb->cells));
 	for (long i = 0; i < ncells; i++)
 		cb->cells[i] = empty_cell;
 }
