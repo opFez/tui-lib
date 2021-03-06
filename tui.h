@@ -158,9 +158,12 @@ void tui_clear_screen();
 /* tui_set_cell() replaces the cell located at index x + y * cb->width in the
  * cell buffer provided in the first argument, effectively changing the cell at 
  * those coordinates.
+ * tui_print() writes the string provided in the fourth argument to the cell
+ * buffer provided in the first argument to the coordinates provided in the
+ * second and third arguments with default color attributes.
  */
 void tui_set_cell(struct cell_buffer *, int, int, struct cell);
-
+void tui_print(struct cell_buffer *, int, int, const char *);
 
 /* tui_hide_cursor() makes the cursor invisible. Useful for drawing the screen.
  * tui_show_cursor() makes the cursor visible again.

@@ -231,6 +231,15 @@ tui_set_cell(struct cell_buffer *cb, int x, int y, struct cell c)
 	cb->cells[x + y * cb->width] = c;
 }
 
+/* a bit hacky, might want to improve it a bit */
+void
+tui_print(struct cell_buffer *cb, int x, int y, const char *s)
+{
+	for (size_t i = x; i < strlen(s); i++) {
+		tui_set_cell(cb, i, y, (struct cell) {s[i], TUI_DEFAULT_FG, TUI_DEFAULT_BG});
+	}
+}
+
 void
 tui_hide_cursor()
 {
