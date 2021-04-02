@@ -308,6 +308,27 @@ tui_poll()
 }
 
 struct event
+tui_poll_noprefix()
+{
+	char c;
+
+	/* change attributes to make the program wait for input */
+	raw.c_cc[VMIN] = 1;
+	if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1)
+		die("tcsetattr");
+
+	read(STDIN_FILENO, &c, 1);
+	/* reset attributes */
+	raw.c_cc[VMIN] = 0;
+	if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1)
+		die("tcsetattr");
+	
+	return (struct event) {
+		0, c
+	};
+}
+
+struct event
 tui_peek()
 {
 	char c;

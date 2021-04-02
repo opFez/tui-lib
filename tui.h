@@ -175,10 +175,15 @@ void tui_show_cursor();
 void tui_set_cursor(int, int);
 
 /* tui_poll() waits for input, and returns the event it recieved.
+ * tui_poll_noprefix() works the same way as tui_poll(), only it does not handle
+ * prefix keys (like escape). This means it can be used wherever one does not
+ * care about prefix keys or when you just want to check if the user has pressed
+ * escape.
  * tui_peek() gets buffered input. The program will not stop and wait for input,
  * like tui_poll(), but buffered input will be returned.
  */
 struct event tui_poll();
+struct event tui_poll_noprefix();
 struct event tui_peek();
 
 
