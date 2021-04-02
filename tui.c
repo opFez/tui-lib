@@ -228,7 +228,9 @@ tui_set_cursor(int x, int y)
 {
 	/* It looks like x and y has to be 1-indexed, so correct this by adding 1 to
 	 * each of them. */
-	printf("\033[%d;%dH", x+1, y+1);
+	char buffer[80] = {0};
+	sprintf(buffer, "\033[%d;%dH", y+1, x+1);
+	write(STDOUT_FILENO, buffer, strlen(buffer));
 }
 
 /* can probably be simplified, but it works well */
