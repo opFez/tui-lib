@@ -100,37 +100,6 @@ restore_cursor()
 	write(STDOUT_FILENO, "\033[u", 3);
 }
 
-/* kr */
-static void
-reverse(char s[])
-{
-    int c, i, j;
-
-    for (i = 0, j = strlen(s) - 1; i < j; i++, j--) {
-        c = s[i];
-        s[i] = s[j];
-        s[j] = c;
-    }
-}
-
-/* kr */
-static void
-itoa(int n, char out[])
-{
-	int i, sign;
-
-	if ((sign = n) < 0) /* record sign */
-		n = -n;           /* make n positive */
-	i = 0;
-	do {  /* generate digits in reverse order */
-		out[i++] = n % 10 + '0';  /* get next digit */
-	} while ((n /= 10) > 0);   /* delete it */
-	if (sign < 0)
-		out[i++] = '-';
-	out[i] = '\0';
-	reverse(out);
-}
-
 /****************************************************/
 
 void
@@ -259,16 +228,7 @@ tui_set_cursor(int x, int y)
 {
 	/* It looks like x and y has to be 1-indexed, so correct this by adding 1 to
 	 * each of them. */
-	char xcoord[8] = {0};
-	itoa(x + 1, xcoord);
-	char ycoord[8] = {0};
-	itoa(y + 1, ycoord);
-
-	write(STDOUT_FILENO, "\033[", 2);
-	write(STDOUT_FILENO, ycoord, strlen(xcoord));
-	write(STDOUT_FILENO, ";", 1);
-	write(STDOUT_FILENO, xcoord, strlen(ycoord));
-	write(STDOUT_FILENO, "H", 1);
+	printf("\033[%d;%dH", x+1, y+1);
 }
 
 /* can probably be simplified, but it works well */
