@@ -129,12 +129,12 @@ extern int cursor_visible;
 /* tui_init() initializes stdscr and initializes raw mode.
  * tui_shutdown() disables raw mode.
  */
-void tui_init();
-void tui_shutdown();
+void tui_init(void);
+void tui_shutdown(void);
 
 /* returns the width and height of the current terminal window. */
-int tui_width();
-int tui_height();
+int tui_width(void);
+int tui_height(void);
 
 /* tui_refresh() displays the contents of the cell buffer provided as the 
  * argument.
@@ -153,7 +153,7 @@ int tui_height();
 void tui_refresh(struct cell_buffer);
 void tui_refresh_cell(struct cell_buffer, int, int);
 void tui_clear(struct cell_buffer *, struct cell);
-void tui_clear_screen();
+void tui_clear_screen(void);
 
 /* tui_set_cell() replaces the cell located at index x + y * cb->width in the
  * cell buffer provided in the first argument, effectively changing the cell at 
@@ -170,8 +170,8 @@ void tui_print(struct cell_buffer *, int, int, const char *);
  * tui_set_cursor() sets the position of the cursor to those given as arguments.
  * The first argument is the x-value and the second value is the y-value.
  */
-void tui_hide_cursor();
-void tui_show_cursor();
+void tui_hide_cursor(void);
+void tui_show_cursor(void);
 void tui_set_cursor(int, int);
 
 /* tui_poll() waits for input, and returns the event it recieved.
@@ -182,9 +182,9 @@ void tui_set_cursor(int, int);
  * tui_peek() gets buffered input. The program will not stop and wait for input,
  * like tui_poll(), but buffered input will be returned.
  */
-struct event tui_poll();
-struct event tui_poll_noprefix();
-struct event tui_peek();
+struct event tui_poll(void);
+struct event tui_poll_noprefix(void);
+struct event tui_peek(void);
 
 
 #ifdef __cplusplus

@@ -34,14 +34,14 @@ die(const char *s)
 }
 
 static void
-disable_raw_mode()
+disable_raw_mode(void)
 {
 	if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios) == -1)
 		die("tcsetattr");
 }
 
 static void
-enable_raw_mode()
+enable_raw_mode(void)
 {
 	if (tcgetattr(STDIN_FILENO, &orig_termios) == -1)
 		die("tcgetattr");
@@ -89,13 +89,13 @@ free_cell_buffer(struct cell_buffer *cb)
 }
 
 static void
-save_cursor()
+save_cursor(void)
 {
 	write(STDOUT_FILENO, "\033[s", 3);
 }
 
 static void
-restore_cursor()
+restore_cursor(void)
 {
 	write(STDOUT_FILENO, "\033[u", 3);
 }
@@ -103,7 +103,7 @@ restore_cursor()
 /****************************************************/
 
 void
-tui_init()
+tui_init(void)
 {
 	enable_raw_mode();
 	tui_set_cursor(0, 0);
@@ -113,7 +113,7 @@ tui_init()
 }
 
 void
-tui_shutdown()
+tui_shutdown(void)
 {
 	free_cell_buffer(&stdscr);
 	disable_raw_mode();
@@ -124,7 +124,7 @@ tui_shutdown()
 }
 
 int
-tui_width()
+tui_width(void)
 {
 	int width;
 	get_window_size(NULL, &width);
@@ -132,7 +132,7 @@ tui_width()
 }
 
 int
-tui_height()
+tui_height(void)
 {
 	int height;
 	get_window_size(&height, NULL);
@@ -187,7 +187,7 @@ tui_clear(struct cell_buffer *cb, struct cell clear_cell)
 }
 
 void
-tui_clear_screen()
+tui_clear_screen(void)
 {
 	write(STDOUT_FILENO, "\033[2J", 4);
 }
@@ -210,14 +210,14 @@ tui_print(struct cell_buffer *cb, int x, int y, const char *s)
 }
 
 void
-tui_hide_cursor()
+tui_hide_cursor(void)
 {
 	cursor_visible = 0;
 	write(STDOUT_FILENO, "\033[?25l", 6);
 }
 
 void
-tui_show_cursor()
+tui_show_cursor(void)
 {
 	cursor_visible = 1;
 	write(STDOUT_FILENO, "\033[?25h", 6);
@@ -235,7 +235,7 @@ tui_set_cursor(int x, int y)
 
 /* can probably be simplified, but it works well */
 struct event
-tui_poll()
+tui_poll(void)
 {
 	char c;
 
@@ -270,7 +270,7 @@ tui_poll()
 }
 
 struct event
-tui_poll_noprefix()
+tui_poll_noprefix(void)
 {
 	char c;
 
@@ -291,7 +291,7 @@ tui_poll_noprefix()
 }
 
 struct event
-tui_peek()
+tui_peek(void)
 {
 	char c;
 
